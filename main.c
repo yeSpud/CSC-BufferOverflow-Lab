@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "hash.h"
-#include "shellcode.h"
 
 int main(int argc, char** argv) {
 
