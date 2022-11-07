@@ -14,10 +14,5 @@ int main(int argc, char** argv) {
 	char* hash = crypt(input, makesalt('6'));
 	printf("Hash: %s\n", hash);
 
-	/*
-	char buf[sizeof(compact)];
-	strcpy(buf, compact); // Used for checking asm code
-	((void(*)( ))buf)( );*/
-
 	return 0;
 }
