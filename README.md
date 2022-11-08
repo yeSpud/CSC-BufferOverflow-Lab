@@ -2,7 +2,11 @@
 The purpose of this lab is to exercise exploiting the root setuid of a program via a buffer overflow.
 
 ## Setup
-This lab will require a 64bit Linux virtual machine with GDB installed.
+This lab will require a 64bit Linux virtual machine with GDB installed, and [ASLR](https://www.networkworld.com/article/3331199/what-does-aslr-do-for-linux.html) disabled. This can be done by adding the file `(/etc/sysctl.d/01-disable-aslr.conf)` containing the following to `sysctl`:
+```txt
+kernel.randomize_va_space = 0
+```
+
 No particular distribution is required, though this has only been tested on Ubuntu and Arch.
 
 Once the VMs are setup make 2 accounts. 
