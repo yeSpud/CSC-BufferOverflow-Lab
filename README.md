@@ -1,4 +1,4 @@
-# UAF CSC Buffer Overflow Lab
+# UAF CSC x86_64 Buffer Overflow Lab
 The purpose of this lab is to exercise exploiting the root setuid of a program via a buffer overflow.
 
 ## Setup
