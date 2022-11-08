@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	char input[256];
+	char input[512];
 	strcpy(input, argv[1]);
 
 	char* hash = crypt(input, makesalt('6'));
