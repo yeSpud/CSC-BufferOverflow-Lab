@@ -15,7 +15,7 @@ Once the VMs are setup make 2 accounts.
 This first account will be an "Administrator" account with a long secure password **(do not use one of your own passwords)**, 
 and sudo / root access. One of the goals of this lab is to compromise this account via a root shell spawned on the second account.
 
-If youd' like to use this as a ctf-style lab you may also include a flag that will appear on the desktop when the user logs into the GUI, 
+If you'd like to use this as a ctf-style lab you may also include a flag that will appear on the desktop when the user logs into the GUI, 
 but for our purposes this will just serve the purpose of demonstrating that you have access to any account as root, 
 and can even log into said accounts.
 
@@ -28,7 +28,7 @@ Just be sure to remove all the other files included with the git repository (you
 
 ## Writeup (Spoilers ahead!)
 
-### Step 0: Information gatheringf
+### Step 0: Information gathering
 
 When looking for information that can be used to our advantage one if the first things to do will be to check out the hash program.
 Running it without any arguments produces the following:
@@ -142,7 +142,7 @@ We can take a look at our stack memory by entering the following:
 0x7fffffffddf0:	0x41414141	0x41414141	0x41414141	0x00007f00
 ```
 
-Look at all those 41s. Lets pick out an address towards the top - memory shifts around slightly, so the larger the buffer the better.
+Look at all those 41s. Let's pick out an address towards the middle - memory shifts around slightly, so the larger the buffer the better.
 Well use `0x7fffffffdc80` for this example.
 
 Going back to our string we have to input our address in backwards as intel is [little endian](https://en.wikipedia.org/wiki/Endianness#Hardware).
